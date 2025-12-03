@@ -1,0 +1,23 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="PyPackageRequirementsInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredPackages">
+        <list>
+          <option value="openai" />
+          <option value="python-dotenv" />
+          <option value="jinja2" />
+          <option value="pandas" />
+          <option value="requests" />
+          <option value="transformers" />
+          <option value="torch" />
+          <option value="sentencepiece" />
+          <option value="fastapi" />
+          <option value="uvicorn" />
+          <option value="python-multipart" />
+          <option value="websockets" />
+        </list>
+      </option>
+    </inspection_tool>
+  </profile>
+</component>
