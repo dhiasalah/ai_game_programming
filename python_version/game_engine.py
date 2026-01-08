@@ -180,28 +180,20 @@ class GameEngine:
         """
         Gère la capture des graines
         Règles :
-        - La capture commence UNIQUEMENT si le dernier trou semé est dans les trous adverses
-        - Remonte en arrière en sens anti-horaire, uniquement dans les trous de l'adversaire
+        - La capture peut se faire depuis N'IMPORTE quel trou (y compris ses propres trous)
+        - Règle officielle: "it is allowed to take the seeds from its own hole"
+        - Remonte en arrière en sens anti-horaire
         - Capture les trous avec exactement 2 ou 3 graines (toutes couleurs confondues)
         - S'arrête dès qu'on rencontre un trou qui n'a pas 2-3 graines
         """
-        opponent = 3 - player
-        opponent_holes = self.state.get_player_holes(opponent)
-
-        # La capture ne s'effectue que si le dernier trou semé est dans les trous adverses
-        if last_hole not in opponent_holes:
-            if self.debug:
-                print(f"[DEBUG] Pas de capture - le dernier trou semé {last_hole} n'est pas un trou adverse")
-            return
-
         if self.debug:
             print(f"[DEBUG] Vérification de capture en partant du trou {last_hole}")
 
         current_hole = last_hole
         captured_total = 0
 
-        # Remonte en arrière en sens anti-horaire, uniquement dans les trous de l'adversaire
-        while current_hole in opponent_holes:
+        # Remonte en arrière en sens anti-horaire depuis n'importe quel trou
+        while True:
             total_seeds = self.state.get_total_seeds(current_hole)
 
             if self.debug:

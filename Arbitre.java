@@ -7,15 +7,15 @@ public class Arbitre {
     private static final int MAX_MOVES = 400;
 
     public static void main(String[] args) throws Exception {
-        // Process A: Python bot with MinMax AI (Player 1 - odd holes)
-        Process A = Runtime.getRuntime().exec("python python_version\\bot.py 1");
+        // Process A: C++ bot with MinMax AI (Player 1 - odd holes)
+        Process A = Runtime.getRuntime().exec("c_version\\bot.exe 1");
         
-        // Process B: C++ bot with MinMax AI (Player 2 - even holes)
-        Process B = Runtime.getRuntime().exec("c_version\\bot.exe 2");
+        // Process B: Python bot with MinMax AI (Player 2 - even holes)
+        Process B = Runtime.getRuntime().exec("python python_version\\bot.py 2");
 
         Joueur joueur1 = new Joueur("Player1", A, 1);
         Joueur joueur2 = new Joueur("Player2", B, 2);
-
+ 
         // Initialiser le jeu
         GameState game = new GameState();
         
@@ -30,7 +30,7 @@ public class Arbitre {
         int nbCoups = 0;
         
         System.out.println("=== DEBUT DE LA PARTIE ===");
-        System.out.println("Player1 (Python MinMax) vs Player2 (C++ MinMax)");
+        System.out.println("Player1 (C++ MinMax) vs Player2 (Python MinMax)");
         System.out.println();
 
         while (!game.isGameOver() && nbCoups < MAX_MOVES) {
@@ -84,9 +84,9 @@ public class Arbitre {
         
         int winner = game.getWinner();
         if (winner == 1) {
-            System.out.println("RESULT Player1 (Python) WINS!");
+            System.out.println("RESULT Player1 (C++) WINS!");
         } else if (winner == 2) {
-            System.out.println("RESULT Player2 (C++) WINS!");
+            System.out.println("RESULT Player2 (Python) WINS!");
         } else {
             System.out.println("RESULT DRAW!");
         }
@@ -202,16 +202,13 @@ public class Arbitre {
         }
         
         void checkCaptures(int lastHole, int player) {
-            int opponent = 3 - player;
             int current = lastHole;
             
-            // La capture commence UNIQUEMENT si le dernier trou semé est dans les trous adverses
-            if (!belongsToPlayer(lastHole, opponent)) {
-                return; // Pas de capture si le dernier trou n'est pas chez l'adversaire
-            }
+            // La capture peut se faire depuis N'IMPORTE quel trou (y compris ses propres trous)
+            // Règle: "it is allowed to take the seeds from its own hole"
             
-            // Remonte en arrière en sens anti-horaire, uniquement dans les trous de l'adversaire
-            while (belongsToPlayer(current, opponent)) {
+            // Remonte en arrière en sens anti-horaire
+            while (true) {
                 int total = holes[current][0] + holes[current][1] + holes[current][2];
                 
                 // Capturer si 2 ou 3 graines

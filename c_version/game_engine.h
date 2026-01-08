@@ -12,38 +12,49 @@
 #include <algorithm>
 #include <iostream>
 
-class GameEngine {
+class GameEngine
+{
 public:
-    GameState* state;
-    bool debug;  // Mettre à true pour voir le détail des captures
+    GameState *state;
+    bool debug; // Mettre à true pour voir le détail des captures
 
-    GameEngine(GameState* game_state) : state(game_state), debug(false) {}
+    GameEngine(GameState *game_state) : state(game_state), debug(false) {}
 
-    int nextHole(int current_hole) const {
+    int nextHole(int current_hole) const
+    {
         /**Retourne le trou suivant en sens horaire*/
-        if (current_hole == 16) {
+        if (current_hole == 16)
+        {
             return 1;
-        } else {
+        }
+        else
+        {
             return current_hole + 1;
         }
     }
 
-    int prevHole(int current_hole) const {
+    int prevHole(int current_hole) const
+    {
         /**Retourne le trou précédent (sens anti-horaire)*/
-        if (current_hole == 1) {
+        if (current_hole == 1)
+        {
             return 16;
-        } else {
+        }
+        else
+        {
             return current_hole - 1;
         }
     }
 
-    bool isOpponentHole(int hole, int player) const {
+    bool isOpponentHole(int hole, int player) const
+    {
         /**Vérifie si un trou appartient à l'adversaire*/
         std::vector<int> player_holes = state->getPlayerHoles(player);
         return std::find(player_holes.begin(), player_holes.end(), hole) == player_holes.end();
     }
 
-    bool playMove(int hole, Color color, Color transparent_as = Color::RED, bool use_transparent = false) {
+    bool playMove(int hole, Color color, Color transparent_as = Color::RED, bool use_transparent = false)
+    {
         /**
         Exécute un coup avec les règles complètes :
         - Si les graines sont rouges : distribuées dans tous les trous
@@ -57,16 +68,19 @@ public:
         int player = state->current_player;
 
         // Vérification de validité
-        if (state->holes[hole][color] == 0) {
+        if (state->holes[hole][color] == 0)
+        {
             return false;
         }
 
         std::vector<int> player_holes = state->getPlayerHoles(player);
-        if (std::find(player_holes.begin(), player_holes.end(), hole) == player_holes.end()) {
+        if (std::find(player_holes.begin(), player_holes.end(), hole) == player_holes.end())
+        {
             return false;
         }
 
-        if (color == Color::TRANSPARENT && !use_transparent) {
+        if (color == Color::TRANSPARENT && !use_transparent)
+        {
             return false;
         }
 
@@ -74,12 +88,13 @@ public:
         Color distribution_rule;
 
         // Déterminer les graines à distribuer
-        if (color == Color::TRANSPARENT) {
+        if (color == Color::TRANSPARENT)
+        {
             // Les graines transparentes + les graines de la couleur désignée sont distribuées ensemble
             int trans_seeds = state->holes[hole][Color::TRANSPARENT];
             int color_seeds = state->holes[hole][transparent_as];
 
-            distribution_rule = transparent_as;  // Règle de distribution (RED ou BLUE)
+            distribution_rule = transparent_as; // Règle de distribution (RED ou BLUE)
 
             int seeds_transparent = trans_seeds;
             int seeds_colored = color_seeds;
@@ -87,10 +102,11 @@ public:
             state->holes[hole][Color::TRANSPARENT] = 0;
             state->holes[hole][transparent_as] = 0;
 
-            if (debug) {
-                std::cout << "\n[DEBUG] Joueur " << player << " joue trou " << hole 
+            if (debug)
+            {
+                std::cout << "\n[DEBUG] Joueur " << player << " joue trou " << hole
                           << ", TRANSPARENT comme " << colorToString(transparent_as) << std::endl;
-                std::cout << "[DEBUG] Graines transparentes: " << seeds_transparent 
+                std::cout << "[DEBUG] Graines transparentes: " << seeds_transparent
                           << ", Graines " << colorToString(transparent_as) << ": " << seeds_colored << std::endl;
             }
 
@@ -99,48 +115,65 @@ public:
             int colored_remaining = seeds_colored;
             int current_hole = hole;
 
-            while (trans_remaining > 0 || colored_remaining > 0) {
+            while (trans_remaining > 0 || colored_remaining > 0)
+            {
                 current_hole = nextHole(current_hole);
 
                 // Déterminer quelle graine distribuer (transparente d'abord)
                 Color current_seed_color;
-                if (trans_remaining > 0) {
+                if (trans_remaining > 0)
+                {
                     current_seed_color = Color::TRANSPARENT;
                     trans_remaining--;
-                } else {
+                }
+                else
+                {
                     current_seed_color = transparent_as;
                     colored_remaining--;
                 }
 
                 // Distribution selon les règles
-                if (distribution_rule == Color::RED) {
+                if (distribution_rule == Color::RED)
+                {
                     // Les rouges vont dans tous les trous
                     state->holes[current_hole][current_seed_color]++;
                     last_hole_seeded = current_hole;
-                    if (debug) {
-                        std::cout << "[DEBUG] Graine " << colorToString(current_seed_color) 
+                    if (debug)
+                    {
+                        std::cout << "[DEBUG] Graine " << colorToString(current_seed_color)
                                   << " -> Trou " << current_hole << " (règle RED)" << std::endl;
                     }
-                } else if (distribution_rule == Color::BLUE) {
+                }
+                else if (distribution_rule == Color::BLUE)
+                {
                     // Les bleus vont uniquement dans les trous adverses
-                    if (isOpponentHole(current_hole, player)) {
+                    if (isOpponentHole(current_hole, player))
+                    {
                         state->holes[current_hole][current_seed_color]++;
                         last_hole_seeded = current_hole;
-                        if (debug) {
-                            std::cout << "[DEBUG] Graine " << colorToString(current_seed_color) 
+                        if (debug)
+                        {
+                            std::cout << "[DEBUG] Graine " << colorToString(current_seed_color)
                                       << " -> Trou adversaire " << current_hole << " (règle BLUE)" << std::endl;
                         }
-                    } else {
+                    }
+                    else
+                    {
                         // Si ce n'est pas un trou adverse, on remet la graine et on continue
-                        if (current_seed_color == Color::TRANSPARENT) {
+                        if (current_seed_color == Color::TRANSPARENT)
+                        {
                             trans_remaining++;
-                        } else {
+                        }
+                        else
+                        {
                             colored_remaining++;
                         }
                     }
                 }
             }
-        } else {
+        }
+        else
+        {
             // Distribution normale pour RED ou BLUE seul
             int seeds_to_distribute = state->holes[hole][color];
             distribution_rule = color;
@@ -150,33 +183,41 @@ public:
             int current_hole = hole;
             int seeds_remaining = seeds_to_distribute;
 
-            if (debug) {
-                std::cout << "\n[DEBUG] Joueur " << player << " joue trou " << hole 
+            if (debug)
+            {
+                std::cout << "\n[DEBUG] Joueur " << player << " joue trou " << hole
                           << ", couleur " << colorToString(seed_color) << std::endl;
                 std::cout << "[DEBUG] Distribution selon les règles: " << colorToString(distribution_rule) << std::endl;
                 std::cout << "[DEBUG] Graines à distribuer: " << seeds_to_distribute << std::endl;
             }
 
-            while (seeds_remaining > 0) {
+            while (seeds_remaining > 0)
+            {
                 current_hole = nextHole(current_hole);
 
                 // Distribution selon les règles de distribution_rule
-                if (distribution_rule == Color::RED) {
+                if (distribution_rule == Color::RED)
+                {
                     // Les rouges vont dans tous les trous
                     state->holes[current_hole][seed_color]++;
                     last_hole_seeded = current_hole;
-                    if (debug) {
-                        std::cout << "[DEBUG] Graine " << colorToString(seed_color) 
+                    if (debug)
+                    {
+                        std::cout << "[DEBUG] Graine " << colorToString(seed_color)
                                   << " -> Trou " << current_hole << " (règle RED)" << std::endl;
                     }
                     seeds_remaining--;
-                } else if (distribution_rule == Color::BLUE) {
+                }
+                else if (distribution_rule == Color::BLUE)
+                {
                     // Les bleus vont uniquement dans les trous adverses
-                    if (isOpponentHole(current_hole, player)) {
+                    if (isOpponentHole(current_hole, player))
+                    {
                         state->holes[current_hole][seed_color]++;
                         last_hole_seeded = current_hole;
-                        if (debug) {
-                            std::cout << "[DEBUG] Graine " << colorToString(seed_color) 
+                        if (debug)
+                        {
+                            std::cout << "[DEBUG] Graine " << colorToString(seed_color)
                                       << " -> Trou adversaire " << current_hole << " (règle BLUE)" << std::endl;
                         }
                         seeds_remaining--;
@@ -186,7 +227,8 @@ public:
         }
 
         // Capture à partir du dernier trou semé (si une graine a été semée)
-        if (last_hole_seeded != -1) {
+        if (last_hole_seeded != -1)
+        {
             captureSeeds(last_hole_seeded, player);
         }
 
@@ -194,60 +236,57 @@ public:
         state->move_count++;
 
         // Changement de joueur
-        state->current_player = 3 - player;  // Alterne entre 1 et 2
+        state->current_player = 3 - player; // Alterne entre 1 et 2
 
         return true;
     }
 
 private:
-    void captureSeeds(int last_hole, int player) {
+    void captureSeeds(int last_hole, int player)
+    {
         /**
         Gère la capture des graines
         Règles :
-        - La capture commence UNIQUEMENT si le dernier trou semé est dans les trous adverses
-        - Remonte en arrière en sens anti-horaire, uniquement dans les trous de l'adversaire
+        - La capture peut se faire depuis N'IMPORTE quel trou (y compris ses propres trous)
+        - Règle officielle: "it is allowed to take the seeds from its own hole"
+        - Remonte en arrière en sens anti-horaire
         - Capture les trous avec exactement 2 ou 3 graines (toutes couleurs confondues)
         - S'arrête dès qu'on rencontre un trou qui n'a pas 2-3 graines
         */
-        int opponent = 3 - player;
-        std::vector<int> opponent_holes = state->getPlayerHoles(opponent);
 
-        // La capture ne s'effectue que si le dernier trou semé est dans les trous adverses
-        if (std::find(opponent_holes.begin(), opponent_holes.end(), last_hole) == opponent_holes.end()) {
-            if (debug) {
-                std::cout << "[DEBUG] Pas de capture - le dernier trou semé " << last_hole 
-                          << " n'est pas un trou adverse" << std::endl;
-            }
-            return;
-        }
-
-        if (debug) {
+        if (debug)
+        {
             std::cout << "[DEBUG] Vérification de capture en partant du trou " << last_hole << std::endl;
         }
 
         int current_hole = last_hole;
         int captured_total = 0;
 
-        // Remonte en arrière en sens anti-horaire, uniquement dans les trous de l'adversaire
-        while (std::find(opponent_holes.begin(), opponent_holes.end(), current_hole) != opponent_holes.end()) {
+        // Remonte en arrière en sens anti-horaire depuis n'importe quel trou
+        while (true)
+        {
             int total_seeds = state->getTotalSeeds(current_hole);
 
-            if (debug) {
+            if (debug)
+            {
                 std::cout << "[DEBUG] Trou " << current_hole << ": " << total_seeds << " graines" << std::endl;
             }
 
-            if (total_seeds == 2 || total_seeds == 3) {
+            if (total_seeds == 2 || total_seeds == 3)
+            {
                 // Capture ce trou
                 int seeds_captured = total_seeds;
                 captured_total += seeds_captured;
 
-                if (debug) {
-                    std::cout << "[DEBUG] ✓ Capture du trou " << current_hole 
+                if (debug)
+                {
+                    std::cout << "[DEBUG] ✓ Capture du trou " << current_hole
                               << " (" << seeds_captured << " graines)" << std::endl;
                 }
 
                 // Réinitialise le trou
-                for (Color col : {Color::RED, Color::BLUE, Color::TRANSPARENT}) {
+                for (Color col : {Color::RED, Color::BLUE, Color::TRANSPARENT})
+                {
                     state->holes[current_hole][col] = 0;
                 }
 
@@ -255,34 +294,40 @@ private:
 
                 // Continue vers le trou précédent
                 current_hole = prevHole(current_hole);
-            } else {
+            }
+            else
+            {
                 // Arrête la capture
-                if (debug) {
-                    std::cout << "[DEBUG] ✗ Fin de capture - le trou " << current_hole 
+                if (debug)
+                {
+                    std::cout << "[DEBUG] ✗ Fin de capture - le trou " << current_hole
                               << " n'a pas 2-3 graines (" << total_seeds << ")" << std::endl;
                 }
                 break;
             }
         }
 
-        if (debug && captured_total > 0) {
+        if (debug && captured_total > 0)
+        {
             std::cout << "[DEBUG] Total capturé: " << captured_total << " graines" << std::endl;
         }
     }
 
 public:
-    std::string getBoardStateString() const {
+    std::string getBoardStateString() const
+    {
         /**Retourne une représentation lisible du plateau*/
         return state->toString();
     }
 };
 
-
-class MoveGenerator {
+class MoveGenerator
+{
 public:
     /**Générateur de mouvements pour l'IA*/
 
-    static std::vector<std::tuple<int, Color, Color, bool>> getAllMoves(const GameState& state, int player) {
+    static std::vector<std::tuple<int, Color, Color, bool>> getAllMoves(const GameState &state, int player)
+    {
         /**
         Génère tous les coups possibles pour un joueur
         IMPORTANT: Les graines TRANSPARENTES ne sont JAMAIS générées automatiquement.
@@ -295,11 +340,14 @@ public:
         */
         std::vector<std::tuple<int, Color, Color, bool>> moves;
 
-        for (int hole : state.getPlayerHoles(player)) {
+        for (int hole : state.getPlayerHoles(player))
+        {
             // Générer les coups UNIQUEMENT pour les couleurs ROUGE et BLEU
             // Les graines TRANSPARENTES ne sont PAS incluses ici
-            for (Color color : {Color::RED, Color::BLUE}) {
-                if (state.holes.at(hole).at(color) > 0) {
+            for (Color color : {Color::RED, Color::BLUE})
+            {
+                if (state.holes.at(hole).at(color) > 0)
+                {
                     moves.push_back({hole, color, Color::RED, false});
                 }
             }
@@ -308,7 +356,8 @@ public:
         return moves;
     }
 
-    static GameState applyMove(const GameState& state, int hole, Color color, Color transparent_as = Color::RED, bool use_transparent = false) {
+    static GameState applyMove(const GameState &state, int hole, Color color, Color transparent_as = Color::RED, bool use_transparent = false)
+    {
         /**
         Applique un coup à un état et retourne le nouvel état
         */
