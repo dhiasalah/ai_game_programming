@@ -236,23 +236,23 @@ class MoveGenerator:
     def get_all_moves(state: GameState, player: int) -> List[Tuple[int, Color, Color]]:
         """
         Génère tous les coups possibles pour un joueur
-        IMPORTANT: Les graines TRANSPARENTES ne sont JAMAIS générées automatiquement.
-        Elles ne peuvent être jouées que si explicitement demandées (format "5TR" ou "5TB")
-        par le joueur humain.
-
-        Pour l'IA et les mouvements automatiques: UNIQUEMENT les couleurs RED et BLUE
+        Inclut les graines RED, BLUE et TRANSPARENT (comme transparentRED et transparentBLUE)
 
         Retourne: (hole, color_to_play, transparent_as_color)
-        transparent_as_color est TOUJOURS None pour les mouvements générés
+        transparent_as_color est None pour RED/BLUE, RED ou BLUE pour TRANSPARENT
         """
         moves = []
 
         for hole in state.get_player_holes(player):
-            # Générer les coups UNIQUEMENT pour les couleurs ROUGE et BLEU
-            # Les graines TRANSPARENTES ne sont PAS incluses ici
-            for color in [Color.RED, Color.BLUE]:
-                if state.holes[hole][color] > 0:
-                    moves.append((hole, color, None))
+            # Générer les coups pour les couleurs ROUGE et BLEU
+            if state.holes[hole][Color.RED] > 0:
+                moves.append((hole, Color.RED, None))
+            if state.holes[hole][Color.BLUE] > 0:
+                moves.append((hole, Color.BLUE, None))
+            # Générer les coups pour TRANSPARENT (comme RED ou comme BLUE)
+            if state.holes[hole][Color.TRANSPARENT] > 0:
+                moves.append((hole, Color.TRANSPARENT, Color.RED))
+                moves.append((hole, Color.TRANSPARENT, Color.BLUE))
 
         return moves
 

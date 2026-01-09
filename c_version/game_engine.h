@@ -330,11 +330,7 @@ public:
     {
         /**
         Génère tous les coups possibles pour un joueur
-        IMPORTANT: Les graines TRANSPARENTES ne sont JAMAIS générées automatiquement.
-        Elles ne peuvent être jouées que si explicitement demandées (format "5TR" ou "5TB")
-        par le joueur humain.
-
-        Pour l'IA et les mouvements automatiques: UNIQUEMENT les couleurs RED et BLUE
+        Inclut les graines RED, BLUE et TRANSPARENT (comme transparentRED et transparentBLUE)
 
         Retourne: (hole, color_to_play, transparent_as_color, use_transparent)
         */
@@ -342,14 +338,20 @@ public:
 
         for (int hole : state.getPlayerHoles(player))
         {
-            // Générer les coups UNIQUEMENT pour les couleurs ROUGE et BLEU
-            // Les graines TRANSPARENTES ne sont PAS incluses ici
-            for (Color color : {Color::RED, Color::BLUE})
+            // Générer les coups pour les couleurs ROUGE et BLEU
+            if (state.holes.at(hole).at(Color::RED) > 0)
             {
-                if (state.holes.at(hole).at(color) > 0)
-                {
-                    moves.push_back({hole, color, Color::RED, false});
-                }
+                moves.push_back({hole, Color::RED, Color::RED, false});
+            }
+            if (state.holes.at(hole).at(Color::BLUE) > 0)
+            {
+                moves.push_back({hole, Color::BLUE, Color::RED, false});
+            }
+            // Générer les coups pour TRANSPARENT (comme RED ou comme BLUE)
+            if (state.holes.at(hole).at(Color::TRANSPARENT) > 0)
+            {
+                moves.push_back({hole, Color::TRANSPARENT, Color::RED, true});
+                moves.push_back({hole, Color::TRANSPARENT, Color::BLUE, true});
             }
         }
 

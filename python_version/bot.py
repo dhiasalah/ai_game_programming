@@ -53,7 +53,7 @@ def main():
         # This uses iterative deepening and only saves results from completed depths
         start_time = time.time()
         
-        best_move = bot.find_best_move(state, my_player, timeout_ms=2000)
+        best_move = bot.find_best_move(state, my_player, timeout_ms=2950)
         
         # Print timing info to stderr (won't affect game protocol)
         total_time = time.time() - start_time

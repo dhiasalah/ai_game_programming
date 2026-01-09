@@ -7,10 +7,10 @@ public class Arbitre {
     private static final int MAX_MOVES = 400;
 
     public static void main(String[] args) throws Exception {
-        // Process A: Python bot with MinMax AI (Player 1 - even holes)
+        // Process A: Python bot with MinMax AI (Player 1 - odd holes)
         Process A = Runtime.getRuntime().exec("python python_version\\bot.py 1");
         
-        // Process B: C++ bot with MinMax AI (Player 2 - odd holes)
+        // Process B: C++ bot with MinMax AI (Player 2 - even holes)
         Process B = Runtime.getRuntime().exec("c_version\\bot.exe 2");
 
         Joueur joueur1 = new Joueur("Player1", A, 1);
@@ -84,9 +84,9 @@ public class Arbitre {
         
         int winner = game.getWinner();
         if (winner == 1) {
-            System.out.println("RESULT Player1 (Python) WINS!");
+            System.out.println("RESULT Player1  WINS!");
         } else if (winner == 2) {
-            System.out.println("RESULT Player2 (C++) WINS!");
+            System.out.println("RESULT Player2  WINS!");
         } else {
             System.out.println("RESULT DRAW!");
         }
@@ -157,38 +157,52 @@ public class Arbitre {
                     return false;
                 }
                 
-                // Simuler la distribution selon les règles
-                int seeds = holes[hole][colorIdx];
-                holes[hole][colorIdx] = 0;
-                
-                // Distribution selon la couleur:
-                // - Rouge (0): va dans TOUS les trous
-                // - Bleu (1): va UNIQUEMENT dans les trous adversaires
                 int current = hole;
-                int distributionColor = isTransparent ? transparentAs : colorIdx;
+                int distributionColor;
+                int transparentSeeds = 0;
+                int coloredSeeds = 0;
                 
-                for (int i = 0; i < seeds; i++) {
-                    current = (current % 16) + 1; // Move to next hole (no source skipping)
+                if (isTransparent) {
+                    // Transparent: prendre les graines transparentes ET les graines de la couleur désignée
+                    transparentSeeds = holes[hole][2]; // Transparent
+                    coloredSeeds = holes[hole][transparentAs]; // RED ou BLUE
+                    holes[hole][2] = 0;
+                    holes[hole][transparentAs] = 0;
+                    distributionColor = transparentAs;
+                } else {
+                    // Normal: prendre seulement les graines de la couleur
+                    coloredSeeds = holes[hole][colorIdx];
+                    holes[hole][colorIdx] = 0;
+                    distributionColor = colorIdx;
+                }
+                
+                // Distribuer d'abord les transparentes, puis les colorées
+                int totalSeeds = transparentSeeds + coloredSeeds;
+                int transRemaining = transparentSeeds;
+                int colorRemaining = coloredSeeds;
+                
+                for (int i = 0; i < totalSeeds; i++) {
+                    // Déterminer quelle graine distribuer (transparente d'abord)
+                    int seedType;
+                    if (transRemaining > 0) {
+                        seedType = 2; // Transparent
+                        transRemaining--;
+                    } else {
+                        seedType = isTransparent ? transparentAs : colorIdx;
+                        colorRemaining--;
+                    }
                     
                     if (distributionColor == 0) {
                         // Rouge: va dans tous les trous
-                        if (isTransparent) {
-                            holes[current][2]++; // Transparent reste transparent
-                        } else {
-                            holes[current][colorIdx]++;
-                        }
+                        current = (current % 16) + 1;
+                        holes[current][seedType]++;
                     } else {
-                        // Bleu: va uniquement dans les trous adversaires
-                        if (belongsToPlayer(current, player)) {
-                            // Ce n'est pas un trou adverse, on continue sans décrémenter
-                            i--;
-                            continue;
+                        // Bleu: va uniquement dans les trous adversaires (saute par 2)
+                        current = (current % 16) + 1;
+                        while (belongsToPlayer(current, player)) {
+                            current = (current % 16) + 1;
                         }
-                        if (isTransparent) {
-                            holes[current][2]++; // Transparent reste transparent
-                        } else {
-                            holes[current][colorIdx]++;
-                        }
+                        holes[current][seedType]++;
                     }
                 }
                 
@@ -229,9 +243,9 @@ public class Arbitre {
         
         boolean belongsToPlayer(int hole, int player) {
             if (player == 1) {
-                return hole % 2 == 0; // Pairs: 2,4,6,8,10,12,14,16
-            } else {
                 return hole % 2 == 1; // Impairs: 1,3,5,7,9,11,13,15
+            } else {
+                return hole % 2 == 0; // Pairs: 2,4,6,8,10,12,14,16
             }
         }
         

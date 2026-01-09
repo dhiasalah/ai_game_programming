@@ -2,8 +2,8 @@
  * Règles du jeu Mancala à 16 trous
  * - 16 trous (8 par joueur)
  * - Numérotés de 1 à 16, en sens horaire
- * - Joueur 1: trous pairs (2,4,6,8,10,12,14,16)
- * - Joueur 2: trous impairs (1,3,5,7,9,11,13,15)
+ * - Joueur 1: trous impairs (1,3,5,7,9,11,13,15)
+ * - Joueur 2: trous pairs (2,4,6,8,10,12,14,16)
  * - Au départ: 2 graines rouges, 2 bleues, 2 transparentes par trou
  * - Trois couleurs: Red (R), Blue (B), Transparent (T)
  */
@@ -69,18 +69,18 @@ public:
     std::vector<int> getPlayerHoles(int player) const
     {
         /**Retourne les trous contrôlés par un joueur
-        Joueur 1: trous pairs, Joueur 2: trous impairs*/
+        Joueur 1: trous impairs, Joueur 2: trous pairs*/
         std::vector<int> result;
         if (player == 1)
         {
-            for (int h = 2; h <= 16; h += 2)
+            for (int h = 1; h <= 16; h += 2)
             {
                 result.push_back(h);
             }
         }
         else
         {
-            for (int h = 1; h <= 16; h += 2)
+            for (int h = 2; h <= 16; h += 2)
             {
                 result.push_back(h);
             }

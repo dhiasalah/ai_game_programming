@@ -144,7 +144,7 @@ int main(int argc, char *argv[])
         // This uses iterative deepening and only saves results from completed depths
         auto start_time = std::chrono::steady_clock::now();
 
-        Move best_move = bot.findBestMove(state, my_player, std::chrono::milliseconds(2000));
+        Move best_move = bot.findBestMove(state, my_player, std::chrono::milliseconds(2950));
 
         // Print timing info to stderr (won't affect game protocol)
         auto end_time = std::chrono::steady_clock::now();
