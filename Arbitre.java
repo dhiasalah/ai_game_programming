@@ -74,11 +74,6 @@ public class Arbitre {
             // Envoyer le coup à l'adversaire
             autre.receive(coup);
             
-            // Vérifier la fin du jeu
-            if (game.isGameOver()) {
-                break;
-            }
-            
             // Changement de joueur
             Joueur tmp = courant;
             courant = autre;
