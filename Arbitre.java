@@ -7,14 +7,14 @@ public class Arbitre {
     private static final int MAX_MOVES = 400;
 
     public static void main(String[] args) throws Exception {
-        // Process A: Your bot (Player 1 - odd holes)
-        Process A = Runtime.getRuntime().exec(new String[]{"c_version\\bot.exe", "JoueurA"});
+        // Process A: Ikram's bot (Player 1 - odd holes)
+        Process A = Runtime.getRuntime().exec(new String[]{"ikram.exe", "JoueurA"});
         
-        // Process B: Marouane's bot (Player 2 - even holes)
-        Process B = Runtime.getRuntime().exec(new String[]{"kacem.exe", "JoueurB"});
+        // Process B: Your bot (Player 2 - even holes)
+        Process B = Runtime.getRuntime().exec(new String[]{"c_version\\bot.exe", "JoueurB"});
 
-        Joueur joueur1 = new Joueur("Your Bot", A, 1);
-        Joueur joueur2 = new Joueur("Marouane Bot", B, 2);
+        Joueur joueur1 = new Joueur("Ikram Bot", A, 1);
+        Joueur joueur2 = new Joueur("Your Bot", B, 2);
  
         // Initialiser le jeu
         GameState game = new GameState();
@@ -22,21 +22,20 @@ public class Arbitre {
         Joueur courant = joueur1;
         Joueur autre = joueur2;
 
-        // Envoyer START aux deux joueurs
-        joueur1.receive("START");
-        joueur2.receive("START");
-
-        String lastMove = "START";
+        String coup = "START";
         int nbCoups = 0;
         
         System.out.println("=== DEBUT DE LA PARTIE ===");
-        System.out.println("Your Bot vs Marouane Bot");
+        System.out.println("Ikram Bot vs Your Bot");
         System.out.println();
 
         while (!game.isGameOver() && nbCoups < MAX_MOVES) {
+            // Envoyer le coup au joueur courant (START pour le premier, puis les coups adverses)
+            courant.receive(coup);
+            
             // Demander le coup au joueur courant
             long startTime = System.currentTimeMillis();
-            String coup = courant.response(TIMEOUT_SECONDS);
+            coup = courant.response(TIMEOUT_SECONDS);
             long endTime = System.currentTimeMillis();
             long elapsedTime = endTime - startTime;
             
@@ -71,9 +70,6 @@ public class Arbitre {
             
             nbCoups++;
             
-            // Envoyer le coup à l'adversaire
-            autre.receive(coup);
-            
             // Changement de joueur
             Joueur tmp = courant;
             courant = autre;
@@ -83,14 +79,14 @@ public class Arbitre {
         // Afficher le résultat final
         System.out.println("\n=== RESULTAT FINAL ===");
         System.out.println("Coups joués: " + nbCoups);
-        System.out.println("Score Your Bot: " + game.capturedSeeds[1]);
-        System.out.println("Score Marouane Bot: " + game.capturedSeeds[2]);
+        System.out.println("Score Ikram Bot: " + game.capturedSeeds[1]);
+        System.out.println("Score Your Bot: " + game.capturedSeeds[2]);
         
         int winner = game.getWinner();
         if (winner == 1) {
-            System.out.println("Gagnant: Your Bot");
+            System.out.println("Gagnant: Ikram Bot");
         } else if (winner == 2) {
-            System.out.println("Gagnant: Marouane Bot");
+            System.out.println("Gagnant: Your Bot");
         } else {
             System.out.println("Match nul");
         }
