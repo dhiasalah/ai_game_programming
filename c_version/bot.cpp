@@ -73,7 +73,6 @@ int main(int argc, char *argv[])
 {
     if (argc < 2)
     {
-        std::cerr << "Usage: bot <player_number>" << std::endl;
         return 1;
     }
 
@@ -158,7 +157,6 @@ int main(int argc, char *argv[])
 
         auto end_time = std::chrono::steady_clock::now();
         long total_time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
-        std::cerr << "[C++] Move time: " << total_time << "ms" << std::endl;
 
         std::string my_move;
 
